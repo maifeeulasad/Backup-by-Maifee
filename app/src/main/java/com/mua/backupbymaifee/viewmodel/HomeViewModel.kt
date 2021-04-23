@@ -3,16 +3,18 @@ package com.mua.backupbymaifee.viewmodel
 import android.app.Application
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.mua.backupbymaifee.data.model.File
 import com.mua.backupbymaifee.repository.HomeRepository
 
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val homeRepository = HomeRepository()
+    private val homeRepository = HomeRepository(application)
 
     private val toScan: MutableLiveData<MutableList<String>> = MutableLiveData(mutableListOf())
-    val scanned: MutableLiveData<MutableList<String>> = homeRepository.scanned
+    val scanned: LiveData<List<File>> = homeRepository.scanned
 
     init {
         val mounts = mounts()

@@ -8,13 +8,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mua.backupbymaifee.adapter.FileAdapter
+import com.mua.backupbymaifee.data.model.File
 import com.mua.backupbymaifee.databinding.FragmentHomeBinding
 import com.mua.backupbymaifee.viewmodel.HomeViewModel
 
 
 class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>() {
     override val viewModel: HomeViewModel by viewModels()
-
+    val filesAdapter = FileAdapter()
     override fun getViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
@@ -43,8 +45,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>() {
 
     private fun initRecycleView() {
         binding.rvScanned.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvScanned.adapter = filesAdapter
         viewModel.scanned.observe(viewLifecycleOwner, Observer {
-            Log.d("d--mua","scanned changed")
+            filesAdapter.files = it.toTypedArray()
         })
     }
 
