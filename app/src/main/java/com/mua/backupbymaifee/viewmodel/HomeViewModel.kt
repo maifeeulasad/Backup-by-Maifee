@@ -3,17 +3,16 @@ package com.mua.backupbymaifee.viewmodel
 import android.app.Application
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.work.*
-import com.mua.backupbymaifee.worker.BfsWorker
+import com.mua.backupbymaifee.repository.HomeRepository
 
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    val toScan: MutableLiveData<MutableList<String>> = MutableLiveData(mutableListOf())
-    val scanned: MutableLiveData<MutableList<String>> = MutableLiveData(mutableListOf())
+    private val homeRepository = HomeRepository()
+
+    private val toScan: MutableLiveData<MutableList<String>> = MutableLiveData(mutableListOf())
+    val scanned: MutableLiveData<MutableList<String>> = homeRepository.scanned
 
     init {
         val mounts = mounts()
@@ -35,6 +34,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
         return res
+    }
+
+
+    fun startScan() {
+        homeRepository.startScan(toScan.value!!)
     }
 
 }

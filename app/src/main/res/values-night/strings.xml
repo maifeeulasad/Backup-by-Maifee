@@ -1,5 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Backup by Maifee</string>
     <string name="start_backup">Start Backup</string>
     <string name="start_scan">Start Scan</string>
 </resources>
