@@ -18,7 +18,7 @@ import com.mua.backupbymaifee.worker.BfsWorker
 
 class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>() {
     override val viewModel: HomeViewModel by viewModels()
-    private val workManager = WorkManager.getInstance(applicationContext())
+    private val workManager = WorkManager.getInstance()
 
     override fun getViewBinding(
         inflater: LayoutInflater,
@@ -36,7 +36,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>() {
     }
 
     private fun observeToScan() {
-        //init{
         viewModel.toScan.observe(viewLifecycleOwner, Observer {
             if (it !== null && it.isNotEmpty()) {
                 Log.d("d--mua", "triggering for size" + it.size)
@@ -57,28 +56,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>() {
                 worker.enqueue()
                 workManager.getWorkInfoByIdLiveData(workRequest.id)
                     .observe(viewLifecycleOwner, Observer {
-                        //Log.d("d--mua", "worker is updating")
                         if (it != null) {
                             val o = it.outputData.getStringArray("TO_SCAN")
-                            if (o != null) {
+                            val p = it.outputData.getStringArray("SCANNED")
+                            if (o != null && p != null) {
                                 val tt = viewModel.toScan.value
                                 tt?.addAll(o.toList())
+                                tt?.removeAll(p.toList())
                                 viewModel.toScan.postValue(tt)
-                                //viewModel.toScan.postValue(o.toList())
-                                //Log.d("d--mua", o.toString())
-                                //Log.d("d--mua", o.joinToString())
                                 val tem = viewModel.scanned.value
                                 tem?.addAll(o.toList())
                                 viewModel.scanned.postValue(tem)
-                                //Log.d("d--mua", o.size.toString() + " size++")
-                                /*
-                                for(x in o){
-                                    Log.d("d--mua", "$x +++")
-                                }
-                                o.forEach {
-                                    Log.d("d--mua", "$it ---")
-                                }
-                                 */
                             }
                         }
                     })
@@ -87,24 +75,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>() {
         viewModel.scanned.observe(viewLifecycleOwner, Observer {
             binding.tvScanned.text = it.joinToString()
         })
-        binding.btnStartBfs.setOnClickListener {
-
-            //workInfo.postValue(workManager.getWorkInfoByIdLiveData(workRequest.id).value)
-
-
-            //viewModel.furtherBfs()
-        }
-        /*
-        viewModel.toScan.observe(viewLifecycleOwner, Observer {
-            viewModel.furtherBfs()
-        })
-         */
-        /*
-        viewModel.workInfo.observe(viewLifecycleOwner, Observer {
-            Log.d("d--mua","worker is updating")
-        })
-
-         */
     }
 
 }
