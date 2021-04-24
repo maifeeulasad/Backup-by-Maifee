@@ -1,15 +1,21 @@
 package com.mua.backupbymaifee.repository
 
 import android.app.Application
+import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import com.mua.backupbymaifee.data.AppDatabase
 import com.mua.backupbymaifee.data.dao.FileDao
 import com.mua.backupbymaifee.data.model.File
+import com.mua.backupbymaifee.service.impl.FileUploadServiceImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Call
+
+import retrofit2.Callback
+import retrofit2.Response
 
 class HomeRepository(application: Application) {
 
@@ -24,6 +30,7 @@ class HomeRepository(application: Application) {
                 continue
             }
             if (!file.isDirectory) {
+                uploadToServer(File(file.absolutePath))
                 GlobalScope.launch {
                     insertFile(File(file.absolutePath))
                 }
@@ -41,8 +48,21 @@ class HomeRepository(application: Application) {
     }
 
     @WorkerThread
-    suspend fun insertFile(file: File) = withContext(Dispatchers.IO){
+    suspend fun insertFile(file: File) = withContext(Dispatchers.IO) {
         fileDao.insert(file)
+    }
+
+    private fun uploadToServer(file:File){
+        FileUploadServiceImpl.upload(file.absolutePath, object : Callback<Boolean> {
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                Log.e("d--mua", "failed" + t.message)
+            }
+
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                Log.d("d--mua", "\t\tsuccess" + response.body())
+            }
+
+        })
     }
 
 }
