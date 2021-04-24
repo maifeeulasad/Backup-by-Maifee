@@ -1,7 +1,6 @@
 package com.mua.backupbymaifee.repository
 
 import android.app.Application
-import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import com.mua.backupbymaifee.data.AppDatabase
@@ -13,7 +12,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Call
-
 import retrofit2.Callback
 import retrofit2.Response
 
@@ -52,17 +50,31 @@ class HomeRepository(application: Application) {
         fileDao.insert(file)
     }
 
-    private fun uploadToServer(file:File){
+    private fun uploadToServer(file: File) {
         FileUploadServiceImpl.upload(file.absolutePath, object : Callback<Boolean> {
             override fun onFailure(call: Call<Boolean>, t: Throwable) {
-                Log.e("d--mua", "failed" + t.message)
+                GlobalScope.launch {
+                    updateFile(file)
+                }
             }
 
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
-                Log.d("d--mua", "\t\tsuccess" + response.body())
+                GlobalScope.launch {
+                    if (response.body() == null) {
+                        updateFile(file, false)
+                    } else {
+                        updateFile(file, response.body()!!)
+                    }
+                }
             }
 
         })
+    }
+
+    @WorkerThread
+    suspend fun updateFile(file: File, uploaded: Boolean = false) = withContext(Dispatchers.IO) {
+        val temFile = File(file.absolutePath, uploaded)
+        fileDao.update(temFile)
     }
 
 }

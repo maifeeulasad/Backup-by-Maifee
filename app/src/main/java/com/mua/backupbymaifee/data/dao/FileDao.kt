@@ -1,10 +1,7 @@
 package com.mua.backupbymaifee.data.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Query
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
+import androidx.room.*
 import com.mua.backupbymaifee.data.model.File
 
 @Dao
@@ -14,4 +11,8 @@ interface FileDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(file: File)
+
+    @Update
+    suspend fun update(file: File)
+
 }
